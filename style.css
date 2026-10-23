@@ -1,0 +1,602 @@
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('assets/PressStart2P-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&display=swap');
+
+:root {
+  --gba-black: #141013;
+  --gba-cream: #fff6d3;
+  --gba-gold: #ffd43b;
+  --gba-orange: #e87a1e;
+  --gba-red: #e62e2d;
+  --gba-green: #38c848;
+  --gba-blue: #29adff;
+  --gba-darkblue: #1d57a5;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #0f0e17;
+  font-family: 'Nunito', sans-serif;
+  color: var(--gba-black);
+  touch-action: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Mobile 9:16 GBA Cartridge Container */
+#app-container {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  max-width: 460px;
+  max-height: 900px;
+  background: url('assets/gba_bg.jpg') center center / cover no-repeat;
+  overflow: hidden;
+  box-shadow: 0 0 0 6px var(--gba-black), 0 20px 50px rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  image-rendering: pixelated;
+}
+
+@media (min-width: 500px) {
+  #app-container {
+    border-radius: 18px;
+    height: 94dvh;
+  }
+}
+
+/* Subtle CRT / GBA LCD pixel scanline overlay */
+#app-container::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.06) 0px,
+    rgba(0, 0, 0, 0.06) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  z-index: 200;
+}
+
+/* Authentic GBA Super Mario World UI Box */
+.gba-box {
+  background: var(--gba-cream);
+  border: 4px solid var(--gba-black);
+  box-shadow:
+    inset 0 0 0 4px var(--gba-gold),
+    0 6px 0 var(--gba-black);
+  border-radius: 6px;
+  padding: 14px;
+  color: var(--gba-black);
+  position: relative;
+}
+
+.gba-btn {
+  background: var(--gba-gold);
+  border: 4px solid var(--gba-black);
+  box-shadow:
+    inset 0 4px 0 #ffffff,
+    inset 0 -4px 0 var(--gba-orange),
+    0 5px 0 var(--gba-black);
+  border-radius: 6px;
+  color: var(--gba-black);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  padding: 13px 14px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.06s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.gba-btn:active {
+  transform: translateY(4px);
+  box-shadow:
+    inset 0 2px 0 #ffffff,
+    0 1px 0 var(--gba-black);
+}
+
+.gba-btn.green {
+  background: var(--gba-green);
+  box-shadow:
+    inset 0 4px 0 #a7f070,
+    inset 0 -4px 0 #1a7a3e,
+    0 5px 0 var(--gba-black);
+  color: #ffffff;
+  text-shadow: 2px 2px 0 var(--gba-black);
+}
+
+.gba-btn.blue {
+  background: var(--gba-blue);
+  box-shadow:
+    inset 0 4px 0 #9cd8fc,
+    inset 0 -4px 0 var(--gba-darkblue),
+    0 5px 0 var(--gba-black);
+  color: #ffffff;
+  text-shadow: 2px 2px 0 var(--gba-black);
+}
+
+/* Screens */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* Top HUD */
+#top-hud {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.hud-pill {
+  pointer-events: auto;
+  background: var(--gba-cream);
+  border: 3px solid var(--gba-black);
+  box-shadow: 0 3px 0 var(--gba-black);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: var(--gba-black);
+  cursor: pointer;
+}
+
+/* TITLE SCREEN */
+#title-screen {
+  justify-content: space-between;
+  padding: 52px 14px 18px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.48) 100%);
+}
+
+.title-banner {
+  text-align: center;
+  padding: 14px 10px;
+  animation: bounceGBA 2.4s ease-in-out infinite;
+}
+
+@keyframes bounceGBA {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.title-sub {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.58rem;
+  color: var(--gba-red);
+  margin-bottom: 8px;
+}
+
+.title-main {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.12rem;
+  line-height: 1.5;
+  color: var(--gba-black);
+  text-shadow: 2px 2px 0 var(--gba-gold);
+}
+
+.gba-stage-showcase {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 18px;
+  margin: 4px 0;
+  height: 155px;
+}
+
+.gba-sprite-stand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.gba-sprite-stand img {
+  height: 122px;
+  width: auto;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 5px 0 rgba(0,0,0,0.45));
+  animation: spriteHop 1.4s ease-in-out infinite;
+}
+
+.gba-sprite-stand.delay img {
+  animation-delay: 0.7s;
+}
+
+@keyframes spriteHop {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.sprite-name-tag {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.58rem;
+  background: var(--gba-black);
+  color: var(--gba-gold);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.title-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* DIALOGUE SCREEN */
+#dialogue-screen {
+  justify-content: flex-end;
+  padding: 54px 12px 16px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.25) 0%, rgba(15, 23, 42, 0.78) 100%);
+}
+
+.world-header-badge {
+  margin: 0 auto auto;
+  text-align: center;
+  padding: 12px 14px;
+  width: 100%;
+}
+
+.world-header-badge h2 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.78rem;
+  color: var(--gba-red);
+  line-height: 1.45;
+}
+
+.world-header-badge p {
+  font-size: 0.88rem;
+  font-weight: 900;
+  margin-top: 5px;
+}
+
+.dialogue-stage-actors {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 150px;
+  margin-bottom: 8px;
+}
+
+.actor-sprite {
+  height: 132px;
+  width: auto;
+  image-rendering: pixelated;
+  transition: transform 0.18s ease, filter 0.18s ease;
+  filter: brightness(0.65) drop-shadow(0 5px 0 rgba(0,0,0,0.5));
+}
+
+.actor-sprite.speaking {
+  transform: scale(1.1) translateY(-8px);
+  filter: brightness(1.05) drop-shadow(0 8px 0 rgba(0,0,0,0.65));
+}
+
+.gba-dialogue-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#dialogue-choices {
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#dialogue-choices.active {
+  display: flex;
+}
+
+.choice-btn {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 0.95rem;
+  text-align: left;
+  padding: 11px 12px;
+}
+
+#dialogue-box-clickable {
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.speaker-pill {
+  display: inline-block;
+  align-self: flex-start;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.68rem;
+  background: var(--gba-black);
+  color: var(--gba-gold);
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+#dialogue-text {
+  font-size: 1.05rem;
+  font-weight: 900;
+  line-height: 1.42;
+}
+
+.dialogue-continue-hint {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: var(--gba-orange);
+  text-align: right;
+  margin-top: 8px;
+  animation: blinkGBA 0.9s infinite;
+}
+
+@keyframes blinkGBA {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+/* ARCADE SCREEN */
+#arcade-screen {
+  background: #141013;
+  justify-content: space-between;
+}
+
+#arcade-top-bar {
+  margin-top: 46px;
+  padding: 6px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 25;
+}
+
+.lives-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.life-head {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  background: var(--gba-gold);
+  border: 2px solid var(--gba-black);
+  border-radius: 4px;
+}
+
+.stage-counter {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.66rem;
+  background: var(--gba-cream);
+  border: 3px solid var(--gba-black);
+  padding: 6px 9px;
+  border-radius: 4px;
+}
+
+#canvas-wrapper {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+#game-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
+/* WarioWare Command Overlay */
+#command-overlay {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(20, 16, 19, 0.56);
+  z-index: 40;
+  pointer-events: none;
+  padding: 16px;
+  text-align: center;
+}
+
+#command-overlay.active {
+  display: flex;
+}
+
+.command-card {
+  background: var(--gba-cream);
+  border: 5px solid var(--gba-black);
+  box-shadow:
+    inset 0 0 0 5px var(--gba-gold),
+    0 10px 0 var(--gba-black);
+  border-radius: 8px;
+  padding: 18px 16px;
+  max-width: 92%;
+  animation: popGBA 0.22s cubic-bezier(0.18, 1.35, 0.4, 1);
+}
+
+@keyframes popGBA {
+  0% { transform: scale(0.5); opacity: 0; }
+  80% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+#command-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.12rem;
+  color: var(--gba-red);
+  text-shadow: 2px 2px 0 var(--gba-gold);
+  line-height: 1.4;
+}
+
+#command-sub {
+  margin-top: 8px;
+  font-size: 0.98rem;
+  font-weight: 900;
+  color: var(--gba-black);
+  line-height: 1.35;
+}
+
+.command-countdown {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 18px;
+  background: var(--gba-black);
+  color: var(--gba-gold);
+  border: 3px solid var(--gba-orange);
+  border-radius: 6px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1.35rem;
+  text-shadow: 2px 2px 0 var(--gba-red);
+  transition: transform 0.1s ease, background 0.1s ease;
+}
+
+.command-countdown.go {
+  background: var(--gba-green);
+  color: #ffffff;
+  border-color: var(--gba-black);
+  text-shadow: 2px 2px 0 var(--gba-black);
+  transform: scale(1.1);
+}
+
+.command-countdown.hidden {
+  display: none;
+}
+
+/* Bomb Timer Bar */
+#bomb-bar-container {
+  height: 38px;
+  background: var(--gba-black);
+  border-top: 4px solid var(--gba-gold);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 8px;
+  z-index: 30;
+}
+
+.fuse-track {
+  flex: 1;
+  height: 14px;
+  background: #2b2329;
+  border: 2px solid var(--gba-cream);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+#fuse-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--gba-red) 0%, var(--gba-orange) 50%, var(--gba-gold) 100%);
+  transition: width 0.05s linear;
+}
+
+/* FINALE SCREEN */
+#finale-screen {
+  padding: 50px 14px 16px;
+  justify-content: space-between;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.45) 0%, rgba(15, 23, 42, 0.88) 100%);
+  overflow-y: auto;
+}
+
+.finale-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  margin: auto 0;
+}
+
+.love-letter-box {
+  background: #ffffff;
+  border: 3px solid var(--gba-black);
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 0.95rem;
+  line-height: 1.48;
+  font-weight: 800;
+  text-align: left;
+  width: 100%;
+}
+
+/* MODALS (Practice & QR Code) */
+.gba-modal {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 14, 23, 0.92);
+  z-index: 150;
+  display: none;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.gba-modal.active {
+  display: flex;
+}
+
+.practice-grid {
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.practice-item {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 0.82rem;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}

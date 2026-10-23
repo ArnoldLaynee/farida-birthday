@@ -1,0 +1,75 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.efe.superfaridaworld'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.efe.superfaridaworld"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("farida-release.jks")
+            storePassword "farida123"
+            keyAlias "farida"
+            keyPassword "farida123"
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+        }
+        debug {
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+tasks.register('syncWebAssets', Copy) {
+    from('../../') {
+        include 'index.html'
+        include 'style.css'
+        include 'manifest.json'
+        include 'audio.js'
+        include 'sprites.js'
+        include 'story.js'
+        include 'microgames.js'
+        include 'microgames_part2.js'
+        include 'game.js'
+    }
+    from('../../assets') {
+        include '*.png'
+        include 'gba_bg.jpg'
+        include '*.ttf'
+        into 'assets'
+    }
+    into 'src/main/assets/www'
+}
+
+afterEvaluate {
+    tasks.matching {
+        it.name != 'syncWebAssets' && (
+            it.name == 'preBuild' ||
+            it.name.contains('Assets') ||
+            it.name.contains('Lint')
+        )
+    }.configureEach {
+        dependsOn('syncWebAssets')
+    }
+}
